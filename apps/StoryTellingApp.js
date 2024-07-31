@@ -9,7 +9,7 @@ class StoryTellingApp extends ConversationalApp {
     appIconName = 'book';
     chatStartInstruction = 'Please provide your age and the topic of the story';
 
-    model = "gpt-3.5-turbo-16k-0613";
+    model = "gpt-4-turbo";
     modelMaxTokens = 16384;
 
     constructor(context) {

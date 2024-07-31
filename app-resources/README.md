@@ -1,1 +1,0 @@
-Used to store app files, accessible through web path /app-resources/{app-folder}/{file.ext}

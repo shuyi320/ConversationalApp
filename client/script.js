@@ -303,6 +303,7 @@ class ConversationalAppEngineClient {
         this.disableChat();
         this.messageform.classList.add('processing');
 
+        //send messgae to the server
         fetch(`${location.origin}/api/chat?app=${this.app.app}`, {
             method: "POST",
             body: JSON.stringify(data),

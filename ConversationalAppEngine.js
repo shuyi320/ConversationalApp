@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import {  OpenAI } from "openai";
 import * as fs from 'node:fs';
 
 const DATA_DIRECTORY_PATH = './data/';
@@ -10,9 +10,9 @@ export class ConversationalAppEngine {
     defaultMessages = [];
 
     constructor(appClass) {
-        this.openai = new OpenAIApi(new Configuration({
-            apiKey: process.env.OPENAI_API_KEY
-        }));
+        this.openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        });
         
         const context = {
             openai: this.openai
@@ -120,20 +120,21 @@ export class ConversationalAppEngine {
         messages.push({ "role": "user", "content": message });
 
         try {
-            this.openai.createChatCompletion({
+            this.openai.chat.completions.create({
                 model: this.app.model,
                 temperature: this.app.temperature,
                 messages: messages,
                 functions: availableFunctions
-            }).then(async (completion) => {
+            }).then(async (completion) => {//Handle successful response
                 console.log("Received from ChatGPT: ");
-                console.log(JSON.stringify(completion.data, null, 2));
-                let responseMessageObject = completion.data.choices[0].message;
+                console.log(JSON.stringify(completion, null, 2));
+                let responseMessageObject = completion.choices[0].message;
 
                 if (responseMessageObject.function_call) {
                     ({ responseMessageObject, completion } = await this.handleFunctionCall(responseMessageObject, availableFunctions, completion, messages));
                 }
 
+                //Handle response by app
                 const responseMessage = responseMessageObject.content;
                 let chatName = await Promise.resolve(this.app.getChatNameFromMessage(responseMessage, message, chat));
                 if (chatName) {
@@ -141,7 +142,7 @@ export class ConversationalAppEngine {
                 }
 
                 messages.push(responseMessageObject);
-                chat.usage.push(completion.data.usage);
+                chat.usage.push(completion.usage);
                 this.storeData();
 
                 const response = {
@@ -149,7 +150,7 @@ export class ConversationalAppEngine {
                     message: await Promise.resolve(this.app.getTextMessage(responseMessage)),
                     appContent: await Promise.resolve(this.app.getAppContent(responseMessage)),
                     chatName: chat.name,
-                    usage: completion.data.usage
+                    usage: completion.usage
                 };
 
                 callback(null, response);
@@ -169,10 +170,12 @@ export class ConversationalAppEngine {
         }
     }
 
+    //handles the invocation of functions if the ChatGPT response includes a function call.
     async handleFunctionCall(responseMessageObject, availableFunctions, completion, messages) {
         while (responseMessageObject.function_call) {
             const functionName = responseMessageObject.function_call.name;
             const hallucinatedFunctionMessages = [];
+            //Checking for Available Functions
             if (availableFunctions.find(f => f.name == functionName)) {
                 messages.push(responseMessageObject);
                 const functionParams = JSON.parse(responseMessageObject.function_call.arguments || '{}');
@@ -192,15 +195,16 @@ export class ConversationalAppEngine {
             }
 
 
-            completion = await Promise.resolve(this.openai.createChatCompletion({
+            //Sending Updated Messages Back to OpenAI:
+            completion = await Promise.resolve(this.openai.chat.completions.create({
                 model: this.app.model,
                 temperature: this.app.temperature,
                 messages: [...messages, ...hallucinatedFunctionMessages],
                 functions: availableFunctions
             }));
             console.log("Received from ChatGPT: ");
-            console.log(JSON.stringify(completion.data));
-            responseMessageObject = completion.data.choices[0].message;
+            console.log(JSON.stringify(completion));
+            responseMessageObject = completion.choices[0].message;
         }
         return { responseMessageObject, completion };
     }
