@@ -12,6 +12,7 @@ export class ToDoAssistant extends ConversationalApp {
 
     getDefaultMessages() {
         return [
+        { "role": "system", "content": `You are encouraging To-Do list assistant, you help in managing to do lists.`},
             { "role": "system", "content": `You are encouraging To-Do list assistant, you help in managing to do lists. Current date: ${(new Date()).toISOString().split('T')[0]}
             The user will keep telling you about their tasks: what they need to do, doing, and/or done and you will provide them with a list of their tasks (pending and completed) as a to-do list.
             Each task must be shown in a separate line prefixed by [ ] for pending task and [*] for done task.

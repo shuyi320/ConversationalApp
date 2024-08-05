@@ -1,7 +1,8 @@
 import {  OpenAI } from "openai";
 import * as fs from 'node:fs';
+import { response } from "express";
 
-const DATA_DIRECTORY_PATH = './data/';
+// const DATA_DIRECTORY_PATH = './data/';
 const APP_RESOURCES_DIRECTORY_PATH = './app-resources/';
 const APP_RESOURCES_WEB_BASE_PATH = '/app-resources/'
 export class ConversationalAppEngine {
@@ -11,7 +12,7 @@ export class ConversationalAppEngine {
 
     constructor(appClass) {
         this.openai = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
+            apiKey: "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",
         });
         
         const context = {
@@ -24,9 +25,9 @@ export class ConversationalAppEngine {
 
         this.defaultMessages = this.app.getDefaultMessages();
 
-        if (!fs.existsSync(DATA_DIRECTORY_PATH)) {
-            fs.mkdirSync(DATA_DIRECTORY_PATH);
-        }
+        // if (!fs.existsSync(DATA_DIRECTORY_PATH)) {
+        //     fs.mkdirSync(DATA_DIRECTORY_PATH);
+        // }
 
         if (!fs.existsSync(APP_RESOURCES_DIRECTORY_PATH + this.getFilesDirectoryName())) {
             fs.mkdirSync(APP_RESOURCES_DIRECTORY_PATH + this.getFilesDirectoryName());
@@ -36,18 +37,32 @@ export class ConversationalAppEngine {
     }
 
     loadData() {
-        fs.readFile(this.getDataFileName(), 'utf8', (error, data) => {
-            if (error) {
-                console.log("Error: " + error);
-            } else {
-                this.userMessages = JSON.parse(data);
-            }
+        const appName = this.app.constructor.name;
+
+        fetch(`http://localhost:3000/api/data/${appName}`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            this.userMessages = data;
+            console.log('Loaded data:', this.userMessages);
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
+        
+        // fs.readFile(this.getDataFileName(), 'utf8', (error, data) => {
+        //     if (error) {
+        //         console.log("Error: " + error);
+        //     } else {
+        //         this.userMessages = JSON.parse(data);
+        //     }
+        // });
     }
 
-    getDataFileName() {
-        return DATA_DIRECTORY_PATH + this.app.constructor.name + '-data.json';
-    }
+    // getDataFileName() {
+    //     return DATA_DIRECTORY_PATH + this.app.constructor.name + '-data.json';
+    // }
 
     getFilesDirectoryName() {
         return this.app.constructor.name;
@@ -55,12 +70,33 @@ export class ConversationalAppEngine {
 
     storeData() {
         const json = JSON.stringify(this.userMessages, null, 2);
-        fs.writeFile(this.getDataFileName(), json, 'utf8', (error) => {
-            if (error) {
-                console.log("Error: " + error);
-            }
-        });
+        const appName = this.app.constructor.name
+
+        fetch(`http://localhost:3000/api/data/${appName}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: json
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
+
+        // fs.writeFile(this.getDataFileName(), json, 'utf8', (error) => {
+        //     if (error) {
+        //         console.log("Error: " + error);
+        //     }
+        // });
+        
+    
 
     getUserChats(userid) {
         const user = this.getUser(userid);
@@ -220,4 +256,7 @@ export class ConversationalAppEngine {
         text = text.replaceAll('{{MAX_TOKENS}}', this.app.modelMaxTokens);
         return text;
     }
+
+
+  
 }

@@ -4,7 +4,7 @@ export class QuizGenerator extends ConversationalApp {
     appName = 'Quiz Generator';
     chatListTitle = 'My Topics';
     newChatLabel = 'New Topic';
-    chatStartInstruction = 'Please provide the article/document that you want to generate a quiz for.';
+    chatStartInstruction = 'Please provide the article/document/topic that you want to generate a quiz for.';
     appIconName = 'quiz';
 
     constructor(context) {
@@ -13,7 +13,7 @@ export class QuizGenerator extends ConversationalApp {
 
     getDefaultMessages() {
         const mainMessage = `
-        I'll provide an article or document content and you will generate a comprehensive multiple choice quiz that covers only the provided content.
+        I'll or you'll provide an article or document content and you will generate a comprehensive multiple choice quiz that covers only the provided content.
         Please provide the quiz in YAML format delimited by four dashes (----) based on the following JSON schema:
         ${JSON.stringify(this.getResponseSchema(), null, 2)}
 

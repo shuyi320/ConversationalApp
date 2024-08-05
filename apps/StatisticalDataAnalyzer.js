@@ -6,20 +6,24 @@ export class StatisticalDataAnalyzer extends ConversationalApp {
   newChatLabel = 'New Data';
   chatStartInstruction = 'Please provide me with the data you want to analyze';
   appIconName = 'insert_chart';
-
+  
   temperature = 0;
 
   constructor(context) {
     super(context);
+    
   }
 
-  getDefaultMessages() {
+
+  
+   getDefaultMessages() {
+    
     return [
-      { "role": "system", "content": "You are statistical data analyzer, you help in extract and visualize statistical data from paragraph of text" },
       {
-        "role": "user", "content": `I'll provide you with a text that may contain statistical data.
-            If the text does not contain statistical data, simply response with 'No statistical data'.
-            If there is statistical data, please extract them as a table (in markdown format) delimited by 4 equal marks ====.
+        "role": "system", "content": `You are data analyzer, your role is to analyzing and interpreting the data 
+        , you extract relevant information, and perform calculations to generate insights based on the question I ask.
+        you help in answer question, extract and visualize data. if your answer has statistical data,
+        please extract them as a table (in markdown format) delimited by 4 equal marks ====.
             After that, please provide a YAML structure that represents a config for Chart.js library based on the following JSON schema:
             ${JSON.stringify(this.getJSONSchema())}
 
@@ -32,9 +36,11 @@ export class StatisticalDataAnalyzer extends ConversationalApp {
             \`\`\`
             {YAML}
             \`\`\`
-            {Trends}
-            ` },
-      { "role": "assistant", "content": "Sure, please provide your text" }
+            {Trends}` },
+      {
+        "role": "user", "content": `I'll provide you with a data-related question in text .`
+      },
+      { "role": "assistant", "content": "Sure, please provide your questions" }
     ];
   }
 

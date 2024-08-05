@@ -12,7 +12,7 @@ class ConversationalApp {
     appIconName = 'token';
 
     temperature = 1;
-    model = 'gpt-4-turbo';
+    model = 'gpt-3.5-turbo';
     modelMaxTokens = 4096;
 
     constructor(context) {

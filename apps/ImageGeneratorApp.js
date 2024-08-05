@@ -9,7 +9,7 @@ class ImageGeneratorApp extends ConversationalApp {
     appIconName = 'palette';
     chatStartInstruction = 'Please let me know what you are trying to innovate?';
 
-    model = "gpt-4-turbo";
+    model = "gpt-3.5-turbo";
     modelMaxTokens = 16384;
 
     constructor(context) {

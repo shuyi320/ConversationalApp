@@ -7,7 +7,7 @@ export class ConversationalAppCreator extends ConversationalApp {
     chatStartInstruction = 'Please briefly describe the purpose of your app, what information will it require from its user, and, what should it display to them.';
     appIconName = 'design_services';
 
-    model =  "gpt-4-0613";
+    model =  "gpt-3.5";
     modelMaxTokens =  8192;
 
     constructor(context) {
