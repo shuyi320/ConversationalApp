@@ -12,7 +12,7 @@ export class ConversationalAppEngine {
 
     constructor(appClass) {
         this.openai = new OpenAI({
-            apiKey: "",
+            apiKey: process.env.OPENAI_API_KEY,
         });
         
         const context = {
